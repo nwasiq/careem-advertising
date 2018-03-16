@@ -1,0 +1,25 @@
+{
+  "name": "careem-advertising",
+  "version": "1.0.0",
+  "description": "Backend for careem advertising platform",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "fs": "0.0.1-security",
+    "fs-extra": "^5.0.0",
+    "jsonwebtoken": "^8.2.0",
+    "mongoose": "^5.0.9",
+    "multer": "^1.3.0",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "path": "^0.12.7"
+  }
+}
