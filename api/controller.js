@@ -6,6 +6,32 @@ const config = require('../config/database');
 const baseURL = "http://localhost:3000";
 const jwt = require('jsonwebtoken');
 
+exports.getAds = function(req, res)
+{
+    AdModel.findOne(req.user._id, function(err, user){
+        if(err) throw err;
+        res.json({
+            success: false,
+            ads: user.ad
+        });
+    });
+}
+
+exports.deleteAds = function(req, res)
+{
+    AdModel.findOne(req.user._id, function(err, user){
+        if(err) throw err;
+        user.ad = [];
+        user.save(function(err){
+            if(err) throw err;
+            res.json({
+                success:true,
+                msg: "Ads cleared"
+            });
+        })
+    });
+}
+
 exports.uploadVideo = function(req, res)
 {
     fileUpload.uploadAd(req, res, (err) => {
@@ -27,10 +53,12 @@ exports.uploadVideo = function(req, res)
                 });
               } else{
                 AdModel.findOne(req.user._id, function(err, user) {
+                    user.adCounter += 1;
                     var advert = {
                         brandName: brandName,
                         videoLink: baseURL + `/ads/${req.file.filename}`,
-                        location: location
+                        location: location,
+                        id: user.adCounter
                     }
                     user.ad.push(advert);
                     user.save(function(err, user){
@@ -87,6 +115,8 @@ exports.login = function (req, res) {
   exports.register = function (req, res) {
     var newUser = new AdModel(req.body);
     var username = req.body.username;
+
+    newUser.adCounter = 0;
   
     AdModel.getUserByUsername(username, function(err, user){
         if(err) throw err;
@@ -99,6 +129,7 @@ exports.login = function (req, res) {
         }
 
         newUser.save(function (err, user) {
+
   
             if (err) {
               res.json({

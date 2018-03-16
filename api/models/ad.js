@@ -3,15 +3,17 @@
 var mongoose = require('mongoose');
 var schema = mongoose.Schema;
 
+//this line registers a model in the schema 
+var adObj = require('./adObj');
+
+var adObjModel = mongoose.model('adobj').schema;
+
 var AdSchema = new schema({
 
     username: String,
     password: String,
-    ad: [{
-        brandName: String,
-        videoLink: String,
-        location: String
-    }]
+    adCounter: Number,
+    ad: [ adObjModel ]
 });
 
 const ad = module.exports = mongoose.model('ad', AdSchema);

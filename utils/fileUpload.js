@@ -20,7 +20,7 @@ function checkFileType(file, cb){
   const storageForAds = multer.diskStorage({
     destination: './public/ads/',
     filename: function(req, file, cb){
-      cb(null,file.fieldname + '-' + req.user._id + path.extname(file.originalname));
+      cb(null,file.fieldname + '-' + (req.user.adCounter + 1) + path.extname(file.originalname));
     }
   });
 

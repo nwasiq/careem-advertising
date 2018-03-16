@@ -18,6 +18,18 @@ module.exports = function (app){
         session: false
       }), controller.uploadVideo);
 
+    app.route('/get-ads')
+      .get(passport.authenticate('jwt', {
+         failureRedirect: '/authfailurejson',
+         session: false
+       }), controller.getAds);
+
+    app.route('/delete-ads')
+      .get(passport.authenticate('jwt', {
+         failureRedirect: '/authfailurejson',
+         session: false
+       }), controller.deleteAds);
+
      app.get('/authfailurejson', function (req, res) {
         res.json({
           success: false,
