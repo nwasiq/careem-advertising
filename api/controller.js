@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const fileUpload = require('../utils/fileUpload');
 const config = require('../config/database');
-const baseURL = "http://localhost:3000";
+const baseURL = "http://192.168.100.11:3000";
 const jwt = require('jsonwebtoken');
 const serverAdsPath = './public/ads/';
 
@@ -14,19 +14,22 @@ var admin = require("firebase-admin");
 
 var serviceAccount = require("/Users/nwasi/Desktop/Workspace/MEAN/careem-advertising/firebase-sdk.json");
 
+var registrationTokenCareemApp = "c4YBYhHacYU:APA91bGlRNAX09zxGmAbDWSThKIVNr27tQOTZ8Des5P-1cFTGmWpeiu4gxhzwpKwN5jWdgmSphFT0TdfvCIM2Yo6S0hn6cGofdlrUGCdIH84twuBqJ0DoVM4wXOKI13yBBDfdOVgbznb";
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://careem-81de0.firebaseio.com"
 });
 
-var topic = 'highScores';
+var topic = "careem";
 var message = {
-  data: {
-    score: '850',
-    time: '2:45'
-  },
-  topic: topic
-};
+    data: {
+      MyKey1: ''
+    },
+    topic: topic
+    // token: registrationTokenCareemApp
+  };
+  
 
 /////////////////////////////  
 
@@ -101,7 +104,8 @@ exports.uploadVideo = function(req, res)
                         if(err) throw err;
 
                         var dryRun = true;
-                        admin.messaging().send(message, dryRun)
+                        message.data.MyKey1 = advert.videoLink;
+                        admin.messaging().send(message)
                         .then((response) => {
                             // Response is a message ID string.
                             console.log('Dry run successful:', response);
