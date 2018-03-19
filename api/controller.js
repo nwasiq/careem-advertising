@@ -1,10 +1,34 @@
 'use strict';
 
 const AdModel = require('./models/ad');
+const fs = require('fs');  
+const path = require('path');
 const fileUpload = require('../utils/fileUpload');
 const config = require('../config/database');
 const baseURL = "http://localhost:3000";
 const jwt = require('jsonwebtoken');
+const serverAdsPath = './public/ads/';
+
+//For firebase
+var admin = require("firebase-admin");
+
+var serviceAccount = require("/Users/nwasi/Desktop/Workspace/MEAN/careem-advertising/firebase-sdk.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://careem-81de0.firebaseio.com"
+});
+
+var topic = 'highScores';
+var message = {
+  data: {
+    score: '850',
+    time: '2:45'
+  },
+  topic: topic
+};
+
+/////////////////////////////  
 
 exports.getAds = function(req, res)
 {
@@ -21,14 +45,26 @@ exports.deleteAds = function(req, res)
 {
     AdModel.findOne(req.user._id, function(err, user){
         if(err) throw err;
-        user.ad = [];
-        user.save(function(err){
-            if(err) throw err;
-            res.json({
-                success:true,
-                msg: "Ads cleared"
-            });
-        })
+        
+        fs.readdir(serverAdsPath, (err, files) => {
+            if (err) throw err;
+          
+            for (const file of files) {
+              fs.unlink(path.join(serverAdsPath, file), err => {
+                if (err) throw err;
+              });
+            }
+
+            user.ad = [];
+            user.adCounter = 0;
+            user.save(function(err){
+                if(err) throw err;
+                res.json({
+                    success:true,
+                    msg: "Ads cleared"
+                });
+            })
+          });
     });
 }
 
@@ -63,6 +99,17 @@ exports.uploadVideo = function(req, res)
                     user.ad.push(advert);
                     user.save(function(err, user){
                         if(err) throw err;
+
+                        var dryRun = true;
+                        admin.messaging().send(message, dryRun)
+                        .then((response) => {
+                            // Response is a message ID string.
+                            console.log('Dry run successful:', response);
+                        })
+                        .catch((error) => {
+                            console.log('Error during dry run:', error);
+                        });
+
                         res.json({
                             success:true,
                             msg: "Advertisement added",
