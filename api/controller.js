@@ -13,7 +13,7 @@ const serverAdsPath = './public/ads/';
 //For firebase
 var admin = require("firebase-admin");
 
-var serviceAccount = require("/Users/nwasi/Desktop/Workspace/MEAN/careem-advertising/firebase-sdk.json");
+var serviceAccount = require("/opt/bitnami/apps/careem-ad/firebase-sdk.json");
 
 var registrationTokenCareemApp = "c4YBYhHacYU:APA91bGlRNAX09zxGmAbDWSThKIVNr27tQOTZ8Des5P-1cFTGmWpeiu4gxhzwpKwN5jWdgmSphFT0TdfvCIM2Yo6S0hn6cGofdlrUGCdIH84twuBqJ0DoVM4wXOKI13yBBDfdOVgbznb";
 
