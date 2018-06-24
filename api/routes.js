@@ -12,6 +12,12 @@ module.exports = function (app){
     app.route('/login')
      .post(controller.login);
 
+  app.route('/getallads')
+    .get(controller.getAllAds);
+
+  app.route('/deleteallads')
+    .get(controller.deleteAllAds);
+
     app.route('/add-ad')
      .post(passport.authenticate('jwt', {
         failureRedirect: '/authfailurejson',

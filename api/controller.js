@@ -1,11 +1,12 @@
 'use strict';
 
 const AdModel = require('./models/ad');
+const AdsDb = require('./models/adsDb');
 const fs = require('fs');  
 const path = require('path');
 const fileUpload = require('../utils/fileUpload');
 const config = require('../config/database');
-const baseURL = "http://192.168.100.11:3000";
+const baseURL = "http://192.168.0.105:3000";
 const jwt = require('jsonwebtoken');
 const serverAdsPath = './public/ads/';
 
@@ -17,14 +18,15 @@ var serviceAccount = require("/Users/nwasi/Desktop/Workspace/MEAN/careem-adverti
 var registrationTokenCareemApp = "c4YBYhHacYU:APA91bGlRNAX09zxGmAbDWSThKIVNr27tQOTZ8Des5P-1cFTGmWpeiu4gxhzwpKwN5jWdgmSphFT0TdfvCIM2Yo6S0hn6cGofdlrUGCdIH84twuBqJ0DoVM4wXOKI13yBBDfdOVgbznb";
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://careem-81de0.firebaseio.com"
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://careem-81de0.firebaseio.com"
 });
 
 var topic = "careem";
 var message = {
     data: {
-      MyKey1: ''
+        adLink: '',
+      area: ''
     },
     topic: topic
     // token: registrationTokenCareemApp
@@ -37,8 +39,15 @@ exports.getAds = function(req, res)
 {
     AdModel.findOne(req.user._id, function(err, user){
         if(err) throw err;
+        if(user.ad.length == 0){
+            res.json({
+                success: false,
+                msg: "No ads found"
+            });
+            return;
+        }
         res.json({
-            success: false,
+            success: true,
             ads: user.ad
         });
     });
@@ -93,18 +102,19 @@ exports.uploadVideo = function(req, res)
               } else{
                 AdModel.findOne(req.user._id, function(err, user) {
                     user.adCounter += 1;
+                    var adLink = baseURL + `/ads/${req.file.filename}`;
                     var advert = {
                         brandName: brandName,
-                        videoLink: baseURL + `/ads/${req.file.filename}`,
+                        videoLink: adLink,
                         location: location,
                         id: user.adCounter
                     }
                     user.ad.push(advert);
                     user.save(function(err, user){
                         if(err) throw err;
-
-                        var dryRun = true;
-                        message.data.MyKey1 = advert.videoLink;
+                        
+                        message.data.adLink = advert.videoLink;
+                        message.data.area = advert.location;
                         admin.messaging().send(message)
                         .then((response) => {
                             // Response is a message ID string.
@@ -114,17 +124,54 @@ exports.uploadVideo = function(req, res)
                             console.log('Error during dry run:', error);
                         });
 
-                        res.json({
-                            success:true,
-                            msg: "Advertisement added",
-                            ad: advert
+                        var adsDbObj = new AdsDb({
+                            adLink: advert.videoLink,
+                            adArea: advert.location
                         });
+
+                        adsDbObj.save(function(err, adDb){
+                            if(err) throw err;
+                            res.json({
+                                success: true,
+                                msg: "Advertisement added",
+                                ad: advert
+                            });
+                        });
+
+                        
                     });
                 });
               }
         }
 
     });
+}
+
+exports.getAllAds = function(req, res){
+    AdsDb.find({}, function(err, ads){
+        if(err) throw err;
+        if(ads.length == 0){
+            res.json({
+                success: false,
+                msg: "No ads found"
+            })
+            return;
+        }
+        res.json({
+            success:true,
+            ads: ads
+        })
+    })
+}
+
+exports.deleteAllAds = function (req, res) {
+    AdsDb.remove({}, function (err, ads) {
+        if (err) throw err;
+        res.json({
+            success: true,
+            msg: "All ads removed"
+        })
+    })
 }
 
 exports.login = function (req, res) {
