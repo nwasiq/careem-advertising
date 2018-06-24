@@ -16,7 +16,7 @@ app.use(cors());
 
 // mongoose instance connection url connection
 mongoose.Promise = global.Promise;
-mongoose.connect(config.localDatabase);
+mongoose.connect(config.ec2Db);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
