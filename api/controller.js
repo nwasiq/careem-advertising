@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const fileUpload = require('../utils/fileUpload');
 const config = require('../config/database');
-const baseURL = "http://192.168.0.105:3000";
+const baseURL = "http://13.57.59.4:3000";
 const jwt = require('jsonwebtoken');
 const serverAdsPath = './public/ads/';
 
